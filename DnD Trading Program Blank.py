@@ -1,3 +1,6 @@
+# Copyright (c) 2025 Nico Mullin
+# Licensed under the MIT License. See LICENSE file for details.
+
 import random
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
