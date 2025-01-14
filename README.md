@@ -50,12 +50,28 @@ Ensure you have the following installed:
 5. **Calculate Prices**: Click the `Calculate Prices` button to view adjusted trading values.
 6. **Save Configurations**: Use the save functionality to store your settings for later.
 
-### Example
-Here is an example workflow:
-1. Create a new island named `Tortuga`.
-2. Add items like `Spices` and `Silk` with their base prices.
-3. Adjust the `Global Modifier` to simulate market demand.
-4. Calculate final prices for a trading session.
+### Screenshots
+This is the Main Screen of the program.
+
+![Main Screen](resources/Program1.png)
+
+This is the Create New Island screen when the button is pressed.
+
+![Create New Isalnd](resources/Program2.png)
+
+This is the Add Custom Item screen when the button is pressed.
+
+![Add Custom Item](resources/Program3.png)
+
+This is one item with no modifers. The base price of rice is 100. The program will fluctuate the base item of that item. The Global Modifier is to raise or lower the base price depending on how the island is doing in terms of money. The sell and buy modifiers are for fine tuneing select items.
+
+![Prices!](resources/Program5.png)
+
+The Quantity box overides all other prices. If at None, place will not sell, but will buy at a high price. If at low, sell prices are higher, and buy prices. If at normal there is no modifiers. If at High, the sell prices are dirt cheep but will not buy any of that item
+
+![Quantity](resources/Program6.png)
+
+
 
 ## Contributing
 Contributions are welcome! To contribute:
