@@ -1,5 +1,9 @@
 ![D&D Trading Program Banner](ProgramBanner.png)
 
+![Python Version](https://img.shields.io/badge/python-3.7%2B-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Status](https://img.shields.io/badge/status-WIP-orange)
+
 
 # D&D Trading Program
 
