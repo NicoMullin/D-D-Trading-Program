@@ -141,6 +141,7 @@ class TradingApp:
 
         tk.Label(credits_window, text="Created by Nico Mullin.", font=("Arial", 12)).pack(pady=10)
         tk.Label(credits_window, text="Help by ChatGPT to get correct values for working.", font=("Arial", 10)).pack(pady=5)
+        tk.Label(credits_window, text="Github: NicoMullin", font=("Arial", 10)).pack(pady=5)
 
         ttk.Button(credits_window, text="Close", command=credits_window.destroy).pack(pady=20)
 
@@ -219,6 +220,7 @@ class TradingApp:
         def save_new_island():
             island_name = island_name_entry.get()
             if island_name and island_name not in islands:
+                # Create new island and include universal items
                 islands[island_name] = universal_items.copy()
                 self.island_menu["values"] = list(islands.keys())
                 new_island_window.destroy()
@@ -227,37 +229,69 @@ class TradingApp:
 
         ttk.Button(new_island_window, text="Save", command=save_new_island).grid(row=1, column=0, columnspan=2, pady=10)
 
+
     def add_custom_item(self):
-        """Add a custom item to the currently selected island."""
+        """Add a custom item to the currently selected island or all islands."""
         if not self.selected_island.get():
             messagebox.showerror("Error", "Please select an island first!")
             return
 
+        # Create a new window for custom item creation
         custom_item_window = tk.Toplevel(self.root)
         custom_item_window.title("Add Custom Item")
+        custom_item_window.geometry("400x200")  # Optional: Set a reasonable size for the window
 
+        # Item Name Field
         tk.Label(custom_item_window, text="Item Name:").grid(row=0, column=0, padx=10, pady=5, sticky="w")
         item_name_entry = tk.Entry(custom_item_window)
         item_name_entry.grid(row=0, column=1, padx=10, pady=5, sticky="w")
 
+        # Base Price Field
         tk.Label(custom_item_window, text="Base Price:").grid(row=1, column=0, padx=10, pady=5, sticky="w")
         item_price_entry = tk.Entry(custom_item_window)
         item_price_entry.grid(row=1, column=1, padx=10, pady=5, sticky="w")
 
+        # Checkbox for "Add to All Islands"
+        add_to_all_islands = tk.BooleanVar()
+        tk.Checkbutton(
+            custom_item_window,
+            text="Add to all islands (including future islands)",
+            variable=add_to_all_islands,
+        ).grid(row=2, column=0, columnspan=2, padx=10, pady=5, sticky="w")
+
+        # Function to Save the Custom Item
         def save_custom_item():
-            item_name = item_name_entry.get()
+            item_name = item_name_entry.get().strip()
             try:
                 item_price = int(item_price_entry.get())
                 if item_name and item_price > 0:
+                    # Add to the currently selected island
                     islands[self.selected_island.get()][item_name] = item_price
+
+                    # Optionally add to all islands if checkbox is checked
+                    if add_to_all_islands.get():
+                        universal_items[item_name] = item_price
+
+                    # Close the window after saving
                     custom_item_window.destroy()
-                    self.update_items_options()  # Refresh all dropdowns
+
+                    # Refresh dropdowns in the main window
+                    self.update_items_options()
                 else:
                     raise ValueError
             except ValueError:
-                messagebox.showerror("Error", "Invalid item name or price!")
+                messagebox.showerror("Error", "Please enter a valid item name and base price!")
 
-        ttk.Button(custom_item_window, text="Save", command=save_custom_item).grid(row=2, column=0, columnspan=2, pady=10)
+        # Add Confirm Button
+        ttk.Button(
+            custom_item_window,
+            text="Confirm",
+            command=save_custom_item
+        ).grid(row=3, column=0, columnspan=2, pady=20)
+
+        # Ensure the window adjusts dynamically to content
+        custom_item_window.update_idletasks()
+
 
     def calculate_prices(self):
         """Calculate final prices for all selected items."""
