@@ -53,19 +53,19 @@ Ensure you have the following installed:
 ### Screenshots
 This is the Main Screen of the program.
 
-![Main Screen](resources/Program1.png)
+![Main Screen](resources/Program1.PNG)
 
 This is the Create New Island screen when the button is pressed.
 
-![Create New Isalnd](resources/Program2.png)
+![Create New Isalnd](resources/Program2.PNG)
 
 This is the Add Custom Item screen when the button is pressed.
 
-![Add Custom Item](resources/Program3.png)
+![Add Custom Item](resources/Program3.PNG)
 
 This is one item with no modifers. The base price of rice is 100. The program will fluctuate the base item of that item. The Global Modifier is to raise or lower the base price depending on how the island is doing in terms of money. The sell and buy modifiers are for fine tuneing select items.
 
-![Prices!](resources/Program5.png)
+![Prices!](resources/Program5.PNG)
 
 The Quantity box overides all other prices. If at None, place will not sell, but will buy at a high price. If at low, sell prices are higher, and buy prices. If at normal there is no modifiers. If at High, the sell prices are dirt cheep but will not buy any of that item
 
