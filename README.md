@@ -42,6 +42,13 @@ Ensure you have the following installed:
    python DnD_Trading_Program.py
    ```
 
+##Demo
+If you would like to test it out without running it on your computer Then please do the following.
+1. Go to this link
+    [https://replit.com/@timdarknesslord/DnD-Trading-Program](https://replit.com/@timdarknesslord/DnD-Trading-Program)
+2. Fork the code, Create an account if you dont have one.
+3. Once forked, on the main.py you should see a green run button with a play icon on it.
+
 ## Usage
 1. **Start the Program**: Launch the application by running the Python script.
 2. **Select an Island**: Choose an island from the dropdown menu to begin trading.
