@@ -1,4 +1,4 @@
-![D&D Trading Program Banner](Program Banner.png)
+![D&D Trading Program Banner](ProgramBanner.png)
 
 
 # D&D Trading Program
