@@ -68,7 +68,7 @@ This is the Create New Island screen when the button is pressed.
 
 This is the Add Custom Item screen when the button is pressed.
 
-![Add Custom Item](resources/Program3.PNG)
+![Add Custom Item](resources/Program7.PNG)
 
 This is one item with no modifers. The base price of rice is 100. The program will fluctuate the base item of that item. The Global Modifier is to raise or lower the base price depending on how the island is doing in terms of money. The sell and buy modifiers are for fine tuneing select items.
 
