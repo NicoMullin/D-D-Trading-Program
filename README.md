@@ -69,7 +69,7 @@ This is one item with no modifers. The base price of rice is 100. The program wi
 
 The Quantity box overides all other prices. If at None, place will not sell, but will buy at a high price. If at low, sell prices are higher, and buy prices. If at normal there is no modifiers. If at High, the sell prices are dirt cheep but will not buy any of that item
 
-![Quantity](resources/Program6.png)
+![Quantity](resources/Program6.PNG)
 
 
 
