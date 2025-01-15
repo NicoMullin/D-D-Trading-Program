@@ -52,15 +52,16 @@ If you would like to test it out without running it on your computer Then please
 ## Usage
 1. **Start the Program**: Launch the application by running the Python script.
 2. **Select an Island**: Choose an island from the dropdown menu to begin trading.
-3. **Add Items**: Define the items and their modifiers for trading.
-4. **Adjust Modifiers**: Use global and item-specific modifiers to influence prices.
-5. **Calculate Prices**: Click the `Calculate Prices` button to view adjusted trading values.
-6. **Save Configurations**: Use the save functionality to store your settings for later.
+3. **Category**: Have items sorted into categories to help on clutter. 
+4. **Add Items**: Define the items and their modifiers for trading.
+5. **Adjust Modifiers**: Use global and item-specific modifiers to influence prices.
+6. **Calculate Prices**: Click the `Calculate Prices` button to view adjusted trading values.
+7. **Save Configurations**: Use the save functionality to store your settings for later.
 
 ### Screenshots
 This is the Main Screen of the program.
 
-![Main Screen](resources/Program1.PNG)
+![Main Screen](resources/Program10.PNG)
 
 This is the Create New Island screen when the button is pressed.
 
@@ -68,16 +69,13 @@ This is the Create New Island screen when the button is pressed.
 
 This is the Add Custom Item screen when the button is pressed.
 
-![Add Custom Item](resources/Program7.PNG)
+![Add Custom Item](resources/Program9.PNG)
 
 This is one item with no modifers. The base price of rice is 100. The program will fluctuate the base item of that item. The Global Modifier is to raise or lower the base price depending on how the island is doing in terms of money. The sell and buy modifiers are for fine tuneing select items.
 
-![Prices!](resources/Program5.PNG)
-
 The Quantity box overides all other prices. If at None, place will not sell, but will buy at a high price. If at low, sell prices are higher, and buy prices. If at normal there is no modifiers. If at High, the sell prices are dirt cheep but will not buy any of that item
 
-![Quantity](resources/Program6.PNG)
-
+![Prices!](resources/Program8.PNG)
 
 
 ## Contributing
