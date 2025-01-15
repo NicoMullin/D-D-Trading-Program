@@ -68,7 +68,6 @@ class TradingApp:
         self.selected_island = tk.StringVar()
         self.global_modifier = tk.IntVar(value=0)
         self.item_entries = []
-        self.result_text = tk.StringVar(value="")
 
         # Island Selection
         ttk.Label(root, text="Select Island:").grid(row=0, column=1, padx=10, pady=5, sticky="w")
@@ -94,11 +93,12 @@ class TradingApp:
         self.items_frame.grid(row=2, column=1, columnspan=4, padx=10, pady=5, sticky="w")
 
         # Add headers for the item selection modifiers
-        ttk.Label(self.items_frame, text="Item").grid(row=0, column=0, padx=5, pady=2, sticky="w")
-        ttk.Label(self.items_frame, text="Sell Modifier (%)").grid(row=0, column=1, padx=5, pady=2, sticky="w")
-        ttk.Label(self.items_frame, text="Buy Modifier (%)").grid(row=0, column=2, padx=5, pady=2, sticky="w")
-        ttk.Label(self.items_frame, text="Quantity").grid(row=0, column=3, padx=5, pady=2, sticky="w")
-        ttk.Label(self.items_frame, text="Actions").grid(row=0, column=4, padx=5, pady=2, sticky="w")
+        ttk.Label(self.items_frame, text="Category").grid(row=0, column=0, padx=5, pady=2, sticky="w")
+        ttk.Label(self.items_frame, text="Item").grid(row=0, column=1, padx=5, pady=2, sticky="w")
+        ttk.Label(self.items_frame, text="Sell Modifier (%)").grid(row=0, column=2, padx=5, pady=2, sticky="w")
+        ttk.Label(self.items_frame, text="Buy Modifier (%)").grid(row=0, column=3, padx=5, pady=2, sticky="w")
+        ttk.Label(self.items_frame, text="Quantity").grid(row=0, column=4, padx=5, pady=2, sticky="w")
+        ttk.Label(self.items_frame, text="Actions").grid(row=0, column=5, padx=5, pady=2, sticky="w")
 
         # Add initial item row
         self.add_item_button = ttk.Button(self.items_frame, text="Add Another Item", command=self.add_item_row)
@@ -125,8 +125,27 @@ class TradingApp:
 
         # Results Display
         ttk.Label(root, text="Results:").grid(row=7, column=1, padx=10, pady=5, sticky="nw")
-        self.result_display = ttk.Label(root, textvariable=self.result_text, anchor="w", justify="left")
-        self.result_display.grid(row=7, column=2, columnspan=4, padx=10, pady=5, sticky="w")
+      
+        # Frame to hold scrollable text widget
+        results_frame = ttk.Frame(root)
+        results_frame.grid(row=7, column=2, columnspan=4, padx=10, pady=5, sticky="nsew")
+
+        # Add scrollbars
+        v_scrollbar = tk.Scrollbar(results_frame, orient="vertical")
+        v_scrollbar.pack(side="right", fill="y")
+
+        h_scrollbar = tk.Scrollbar(results_frame, orient="horizontal")
+        h_scrollbar.pack(side="bottom", fill="x")
+
+        # Add a scrollable Text widget
+        self.result_display = tk.Text(results_frame, wrap="none", height=10, width=50, 
+        yscrollcommand=v_scrollbar.set, xscrollcommand=h_scrollbar.set)
+        self.result_display.pack(side="left", fill="both", expand=True)
+
+        # Configure scrollbars to control the text widget
+        v_scrollbar.config(command=self.result_display.yview)
+        h_scrollbar.config(command=self.result_display.xview)
+
 
         # Credits Button
         credits_button = ttk.Button(root, text="Credits", command=self.show_credits)
@@ -137,49 +156,73 @@ class TradingApp:
         """Show a credits window."""
         credits_window = tk.Toplevel(self.root)
         credits_window.title("Credits")
-        credits_window.geometry("300x150")
+        credits_window.geometry("350x250")
 
         tk.Label(credits_window, text="Created by Nico Mullin.", font=("Arial", 12)).pack(pady=10)
-        tk.Label(credits_window, text="Help by ChatGPT to get correct values for working.", font=("Arial", 10)).pack(pady=5)
+        tk.Label(credits_window, text="Used ChatGPT to help with coding.", font=("Arial", 10)).pack(pady=5)
         tk.Label(credits_window, text="Github: NicoMullin", font=("Arial", 10)).pack(pady=5)
+        tk.Label(credits_window, text="This will always be free. Never pay to use for the program.", font=("Arial", 10)).pack(pady=5)
+        tk.Label(credits_window, text="https://github.com/NicoMullin/D-D-Trading-Program", font=("Arial", 10)).pack(pady=5)
 
         ttk.Button(credits_window, text="Close", command=credits_window.destroy).pack(pady=20)
 
     def add_item_row(self):
         """Add a new row for item selection and modifiers."""
+        category_var = tk.StringVar()
         item_var = tk.StringVar()
         sell_modifier = tk.IntVar(value=0)
         buy_modifier = tk.IntVar(value=0)
         quantity_var = tk.StringVar(value="None")
-
-        # Dynamically fetch the latest items for the selected island
+    
+        # Dynamically fetch the latest items and categories for the selected island
         selected_island = self.selected_island.get()
-        available_items = list(islands[selected_island].keys()) if selected_island in islands else []
-
-        row_index = len(self.item_entries) + 1  # Determine the new row index dynamically
+        categories = list(islands[selected_island].keys()) if selected_island in islands else []
+        available_items = list(islands[selected_island][categories[0]].keys()) if categories else []
+    
+        row_index = len(self.item_entries) + 1
+    
+        # Category Dropdown
+        category_dropdown = ttk.Combobox(self.items_frame, textvariable=category_var, values=categories, state="readonly", width=30)
+        category_dropdown.grid(row=row_index, column=0, padx=5, pady=2, sticky="w")
+        Tooltip(category_dropdown, "Select a category.")
+    
+        def update_items_for_category(event=None):
+            """Update items dropdown when a category is selected."""
+            selected_category = category_var.get()
+            available_items = list(islands[selected_island][selected_category].keys()) if selected_category in islands[selected_island] else []
+            dropdown["values"] = available_items
+    
+        category_dropdown.bind("<<ComboboxSelected>>", update_items_for_category)
+    
+        # Item Dropdown
         dropdown = ttk.Combobox(self.items_frame, textvariable=item_var, values=available_items, state="readonly")
-        dropdown.grid(row=row_index, column=0, padx=5, pady=2, sticky="w")
+        dropdown.grid(row=row_index, column=1, padx=5, pady=2, sticky="w")
         Tooltip(dropdown, "Select an item to trade.")
-
+    
+        # Sell Modifier Spinbox
         sell_spinbox = ttk.Spinbox(self.items_frame, from_=-100, to=100, increment=5, textvariable=sell_modifier, width=10)
-        sell_spinbox.grid(row=row_index, column=1, padx=5, pady=2)
+        sell_spinbox.grid(row=row_index, column=2, padx=5, pady=2)
         Tooltip(sell_spinbox, "Set a modifier for the sell price of the selected item.")
-
+    
+        # Buy Modifier Spinbox
         buy_spinbox = ttk.Spinbox(self.items_frame, from_=-100, to=100, increment=5, textvariable=buy_modifier, width=10)
-        buy_spinbox.grid(row=row_index, column=2, padx=5, pady=2)
+        buy_spinbox.grid(row=row_index, column=3, padx=5, pady=2)
         Tooltip(buy_spinbox, "Set a modifier for the buy price of the selected item.")
-
+    
+        # Quantity Dropdown
         quantity_dropdown = ttk.Combobox(self.items_frame, textvariable=quantity_var, values=["None", "Normal", "Low", "High"], state="readonly")
-        quantity_dropdown.grid(row=row_index, column=3, padx=5, pady=2, sticky="w")
+        quantity_dropdown.grid(row=row_index, column=4, padx=5, pady=2, sticky="w")
         Tooltip(quantity_dropdown, "Select the quantity of the item.")
-
+    
+        # Remove Button
         remove_button = ttk.Button(self.items_frame, text="Remove", command=lambda: self.remove_item_row(row_index - 1))
-        remove_button.grid(row=row_index, column=4, padx=5, pady=2)
+        remove_button.grid(row=row_index, column=5, padx=5, pady=2)
         Tooltip(remove_button, "Remove this item entry.")
+    
+        self.item_entries.append((category_var, item_var, sell_modifier, buy_modifier, quantity_var, category_dropdown, dropdown, sell_spinbox, buy_spinbox, quantity_dropdown, remove_button))
+    
+        self.add_item_button.grid(row=row_index + 1, column=5, padx=5, pady=10, sticky="w")
 
-        self.item_entries.append((item_var, sell_modifier, buy_modifier, quantity_var, dropdown, sell_spinbox, buy_spinbox, quantity_dropdown, remove_button))
-
-        self.add_item_button.grid(row=row_index + 1, column=4, padx=5, pady=10, sticky="w")
 
     def remove_item_row(self, row_index):
         """Remove a specific item row."""
@@ -200,38 +243,53 @@ class TradingApp:
             self.add_item_button.grid(row=len(self.item_entries) + 1, column=4, padx=5, pady=10, sticky="w")
 
     def update_items_options(self, event=None):
-        """Update the item dropdown options based on the selected island."""
+        """Update the item dropdown options based on the selected island and categories."""
         selected_island = self.selected_island.get()
         if selected_island in islands:
-            items = list(islands[selected_island].keys())
+            items = []
+            for category, category_items in islands[selected_island].items():
+                items.extend(category_items.keys())
             for entry in self.item_entries:
                 dropdown = entry[4]
                 dropdown["values"] = items
 
     def create_new_island(self):
-        """Create a new island with custom items."""
-        new_island_window = tk.Toplevel(self.root)
-        new_island_window.title("Create New Island")
+       """Create a new island with predefined categories."""
+       new_island_window = tk.Toplevel(self.root)
+       new_island_window.title("Create New Island")
+   
+       tk.Label(new_island_window, text="Island Name:").grid(row=0, column=0, padx=10, pady=5, sticky="w")
+       island_name_entry = tk.Entry(new_island_window)
+       island_name_entry.grid(row=0, column=1, padx=10, pady=5, sticky="w")
+  
+       def save_new_island():
+           island_name = island_name_entry.get().strip()
+           if island_name and island_name not in islands:
+               islands[island_name] = {
+                   "Textiles and Fabrics": {},
+                   "Food and Beverages": {},
+                   "Spices and Plants": {},
+                   "Tools, Ship and Supplies": {},
+                   "Animal and Livestock Products": {},
+                   "Trade Goods": {},
+                   "Artistic and Decorative Items": {},
+                   "Rare and Collectible Items": {},
+                   "Religious and Cultural Items": {},
+                   "Furniture and Household Goods": {},
+                   "Navigation and Writing Tools": {},
+                   "Weapons and Explosives": {},
+               }
+               self.island_menu["values"] = list(islands.keys())
+               new_island_window.destroy()
+           else:
+               messagebox.showerror("Error", "Island name is invalid or already exists!")
+  
+       ttk.Button(new_island_window, text="Save", command=save_new_island).grid(row=1, column=0, columnspan=2, pady=10)
 
-        tk.Label(new_island_window, text="Island Name:").grid(row=0, column=0, padx=10, pady=5, sticky="w")
-        island_name_entry = tk.Entry(new_island_window)
-        island_name_entry.grid(row=0, column=1, padx=10, pady=5, sticky="w")
-
-        def save_new_island():
-            island_name = island_name_entry.get()
-            if island_name and island_name not in islands:
-                # Create new island and include universal items
-                islands[island_name] = universal_items.copy()
-                self.island_menu["values"] = list(islands.keys())
-                new_island_window.destroy()
-            else:
-                messagebox.showerror("Error", "Island name is invalid or already exists!")
-
-        ttk.Button(new_island_window, text="Save", command=save_new_island).grid(row=1, column=0, columnspan=2, pady=10)
 
 
     def add_custom_item(self):
-        """Add a custom item to the currently selected island or all islands."""
+        """Add a custom item to the currently selected island and category."""
         if not self.selected_island.get():
             messagebox.showerror("Error", "Please select an island first!")
             return
@@ -239,103 +297,102 @@ class TradingApp:
         # Create a new window for custom item creation
         custom_item_window = tk.Toplevel(self.root)
         custom_item_window.title("Add Custom Item")
-        custom_item_window.geometry("400x200")  # Optional: Set a reasonable size for the window
+        custom_item_window.geometry("400x350")
 
-        # Item Name Field
         tk.Label(custom_item_window, text="Item Name:").grid(row=0, column=0, padx=10, pady=5, sticky="w")
         item_name_entry = tk.Entry(custom_item_window)
         item_name_entry.grid(row=0, column=1, padx=10, pady=5, sticky="w")
 
-        # Base Price Field
         tk.Label(custom_item_window, text="Base Price:").grid(row=1, column=0, padx=10, pady=5, sticky="w")
         item_price_entry = tk.Entry(custom_item_window)
         item_price_entry.grid(row=1, column=1, padx=10, pady=5, sticky="w")
 
-        # Checkbox for "Add to All Islands"
-        add_to_all_islands = tk.BooleanVar()
-        tk.Checkbutton(
-            custom_item_window,
-            text="Add to all islands (including future islands)",
-            variable=add_to_all_islands,
-        ).grid(row=2, column=0, columnspan=2, padx=10, pady=5, sticky="w")
+        # Dropdown to select category
+        tk.Label(custom_item_window, text="Category:").grid(row=2, column=0, padx=10, pady=5, sticky="w")
+        category_var = tk.StringVar()
+        categories = list(islands[self.selected_island.get()].keys())
+        category_menu = ttk.Combobox(custom_item_window, textvariable=category_var, values=categories, state="readonly")
+        category_menu.grid(row=2, column=1, padx=10, pady=5, sticky="w")
 
-        # Function to Save the Custom Item
+        # Checkbox for applying to all islands
+        apply_to_all_var = tk.BooleanVar()
+        apply_to_all_checkbox = ttk.Checkbutton(
+            custom_item_window,
+            text="Apply to all islands (existing and future)",
+            variable=apply_to_all_var
+        )
+        apply_to_all_checkbox.grid(row=3, column=0, columnspan=2, padx=10, pady=15, sticky="w")
+
         def save_custom_item():
+            """Save the custom item."""
             item_name = item_name_entry.get().strip()
             try:
                 item_price = int(item_price_entry.get())
-                if item_name and item_price > 0:
-                    # Add to the currently selected island
-                    islands[self.selected_island.get()][item_name] = item_price
+                selected_category = category_var.get()
+                if item_name and item_price > 0 and selected_category:
+                    # Add item to the current island
+                    islands[self.selected_island.get()][selected_category][item_name] = item_price
 
-                    # Optionally add to all islands if checkbox is checked
-                    if add_to_all_islands.get():
-                        universal_items[item_name] = item_price
+                    # If apply_to_all is checked, add the item to all other islands
+                    if apply_to_all_var.get():
+                        for island_name, island_categories in islands.items():
+                            if selected_category not in island_categories:
+                                island_categories[selected_category] = {}
+                            island_categories[selected_category][item_name] = item_price
 
-                    # Close the window after saving
                     custom_item_window.destroy()
-
-                    # Refresh dropdowns in the main window
-                    self.update_items_options()
+                    self.update_items_options()  # Refresh item dropdowns
                 else:
                     raise ValueError
             except ValueError:
-                messagebox.showerror("Error", "Please enter a valid item name and base price!")
+                messagebox.showerror("Error", "Please enter a valid item name, base price, and category!")
 
-        # Add Confirm Button
-        ttk.Button(
-            custom_item_window,
-            text="Confirm",
-            command=save_custom_item
-        ).grid(row=3, column=0, columnspan=2, pady=20)
-
-        # Ensure the window adjusts dynamically to content
-        custom_item_window.update_idletasks()
+        # Confirm Button
+        ttk.Button(custom_item_window, text="Confirm", command=save_custom_item).grid(row=4, column=0, columnspan=2, pady=20)
 
 
     def calculate_prices(self):
-        """Calculate final prices for all selected items."""
+        """Calculate and display final buy and sell prices grouped by categories."""
         selected_island = self.selected_island.get()
         if not selected_island:
             messagebox.showerror("Error", "Please select an island first!")
             return
 
         global_modifier = self.global_modifier.get()
-        results = []
+        results = {}
 
-        for item_var, sell_modifier, buy_modifier, quantity_var, dropdown, _, _, _, _ in self.item_entries:
-            item_name = item_var.get()
-            if not item_name:
-                continue
+        for category, items in islands[selected_island].items():
+            results[category] = []
+            for item_name, base_price in items.items():
+                # Calculate fluctuated and adjusted prices
+                fluctuated_price = calculate_fluctuated_price(base_price)
 
-            base_price = islands[selected_island][item_name]
-            fluctuated_price = calculate_fluctuated_price(base_price)
-            sell_price = calculate_adjusted_price(fluctuated_price, sell_modifier.get() - global_modifier)
-            buy_price = calculate_adjusted_price(fluctuated_price, buy_modifier.get() + global_modifier)
+                # Find relevant modifiers from item entries
+                sell_modifier = 0
+                buy_modifier = 0
+                for entry in self.item_entries:
+                    if entry[1].get() == item_name:  # Match item_var
+                        sell_modifier = entry[2].get()  # sell_modifier
+                        buy_modifier = entry[3].get()  # buy_modifier
+                        break
 
-            # Apply quantity-based adjustments
-            quantity = quantity_var.get()
-            if quantity == "None":
-                sell_price = 0
-                buy_price = calculate_adjusted_price(buy_price, 100)
-            elif quantity == "Normal":
-                pass
-            elif quantity == "Low":
-                sell_price = calculate_adjusted_price(sell_price, 75)
-                buy_price = calculate_adjusted_price(buy_price, 50)
-            elif quantity == "High":
-                sell_price = calculate_adjusted_price(sell_price, -75)
-                buy_price = 0
+                # Apply modifiers
+                final_sell_price = calculate_adjusted_price(fluctuated_price, sell_modifier + global_modifier)
+                final_buy_price = calculate_adjusted_price(fluctuated_price, buy_modifier + global_modifier)
 
-            results.append(
-                f"Item: {item_name}\n"
-                f"  Base Price: {base_price}\n"
-                f"  Fluctuated Price: {fluctuated_price}\n"
-                f"  Selling Price (with {sell_modifier.get()}%, global {global_modifier}%, quantity {quantity}): {sell_price}\n"
-                f"  Buying Price (with {buy_modifier.get()}%, global {global_modifier}%, quantity {quantity}): {buy_price}"
-            )
+                # Add the result for this item
+                results[category].append(
+                    f"{item_name} - Sell Price: {final_sell_price}, Buy Price: {final_buy_price}"
+                )
 
-        self.result_text.set("\n\n".join(results))
+        # Clear and display categorized results
+        self.result_display.delete(1.0, tk.END)
+        for category, items in results.items():
+            self.result_display.insert(tk.END, f"{category}\n{'=' * len(category)}\n")
+            for item in items:
+                self.result_display.insert(tk.END, f"{item}\n")
+            self.result_display.insert(tk.END, "\n")
+
 
     def save_configuration(self):
         """Save the current configuration to a JSON file."""
@@ -344,12 +401,13 @@ class TradingApp:
             "global_modifier": self.global_modifier.get(),
             "item_entries": [
                 {
-                    "item": item_var.get(),
-                    "sell_modifier": sell_modifier.get(),
-                    "buy_modifier": buy_modifier.get(),
-                    "quantity": quantity_var.get(),
+                    "category": entry[0].get(),
+                    "item": entry[1].get(),
+                    "sell_modifier": entry[2].get(),
+                    "buy_modifier": entry[3].get(),
+                    "quantity": entry[4].get(),
                 }
-                for item_var, sell_modifier, buy_modifier, quantity_var, _, _, _, _, _ in self.item_entries
+                for entry in self.item_entries
             ],
             "islands": islands,  # Include the custom islands and their items
         }
@@ -388,19 +446,24 @@ class TradingApp:
 
                 # Clear existing item rows
                 for entry in self.item_entries:
-                    for widget in entry[4:]:  # Widgets are stored starting from index 4
+                    for widget in entry[5:]:  # Widgets are stored starting from index 5
                         if hasattr(widget, "destroy"):
                             widget.destroy()
 
                 self.item_entries = []  # Reset the item entries list
 
                 # Recreate item rows from the loaded configuration
-                for entry in config.get("item_entries", []):
-                    self.add_item_row()  # Add a new row
-                    self.item_entries[-1][0].set(entry["item"])  # item_var
-                    self.item_entries[-1][1].set(entry["sell_modifier"])  # sell_modifier
-                    self.item_entries[-1][2].set(entry["buy_modifier"])  # buy_modifier
-                    self.item_entries[-1][3].set(entry["quantity"])  # quantity_var
+                for saved_entry in config.get("item_entries", []):
+                    # Create a new row
+                    self.add_item_row()
+
+                    # Populate the row with saved data
+                    current_entry = self.item_entries[-1]  # Get the most recently added entry
+                    current_entry[0].set(saved_entry["category"])  # category_var
+                    current_entry[1].set(saved_entry["item"])      # item_var
+                    current_entry[2].set(saved_entry["sell_modifier"])  # sell_modifier
+                    current_entry[3].set(saved_entry["buy_modifier"])   # buy_modifier
+                    current_entry[4].set(saved_entry["quantity"])       # quantity_var
 
                 messagebox.showinfo("Success", "Configuration loaded successfully!")
             except Exception as e:
